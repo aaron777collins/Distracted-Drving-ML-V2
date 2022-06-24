@@ -1,6 +1,6 @@
 import os.path as path
-from Easy_ML.helper import Helper
-from Easy_ML.DataGatherer import DataGatherer
+from EasyMLLib.helper import Helper
+from EasyMLLib.DataGatherer import DataGatherer
 
 import pandas as pd
 

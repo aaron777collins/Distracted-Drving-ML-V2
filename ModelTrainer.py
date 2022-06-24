@@ -20,15 +20,15 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
-from Easy_ML.helper import Helper
+from EasyMLLib.helper import Helper
 from DataCleaner import DataCleaner
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier, StackingClassifier
 from matplotlib import pyplot as plt
 
-from Easy_ML.DataSplitter import DataSplitter
-from Easy_ML.logger import Logger
-from Easy_ML.ModelSaver import ModelSaver
-from Easy_ML.CSVWriter import CSVWriter
+from EasyMLLib.DataSplitter import DataSplitter
+from EasyMLLib.logger import Logger
+from EasyMLLib.ModelSaver import ModelSaver
+from EasyMLLib.CSVWriter import CSVWriter
 
 DIB_NAME = "DIB1"
 DATASETS_PATH = path.join(DIB_NAME, 'dataRaw', 'ID')

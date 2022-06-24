@@ -3,7 +3,7 @@ import pandas as pd
 
 import os.path as path
 from gatherData import Gatherer
-from Easy_ML.helper import Helper
+from EasyMLLib.helper import Helper
 
 DIB_NAME = "DIB1"
 DATASETS_PATH = path.join("data", DIB_NAME, 'dataRaw', 'ID')

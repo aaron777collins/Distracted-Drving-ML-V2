@@ -7,8 +7,8 @@ import os.path as path
 # sys.path.insert(2, p)
 # # Imports parent modules
 # import ImportParentFiles
-from Easy_ML.logger import Logger
-from Easy_ML.CSVWriter import OUTPUT_FOLDER_PATH
+from EasyMLLib.logger import Logger
+from EasyMLLib.CSVWriter import OUTPUT_FOLDER_PATH
 import pandas as pd
 
 from typing import List

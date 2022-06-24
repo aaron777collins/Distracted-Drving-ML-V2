@@ -29,3 +29,4 @@ six
 threadpoolctl
 urllib3
 Werkzeug
+EasyMLLib

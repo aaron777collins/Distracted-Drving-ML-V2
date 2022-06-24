@@ -5,13 +5,13 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 
-from Easy_ML.DataGatherer import DataGatherer
-from Easy_ML.helper import Helper
+from EasyMLLib.DataGatherer import DataGatherer
+from EasyMLLib.helper import Helper
 from DataCleaner import DataCleaner
 from sklearn.ensemble import RandomForestClassifier, StackingClassifier
 from matplotlib import pyplot as plt
-from Easy_ML.logger import Logger
-from Easy_ML.CSVWriter import CSVWriter
+from EasyMLLib.logger import Logger
+from EasyMLLib.CSVWriter import CSVWriter
 
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.gaussian_process import GaussianProcessClassifier
@@ -24,7 +24,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.gaussian_process.kernels import RBF
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier, StackingClassifier
 
-from Easy_ML.DataSplitter import DataSplitter
+from EasyMLLib.DataSplitter import DataSplitter
 
 CSV_COLUMNS = ["Model"]
 
