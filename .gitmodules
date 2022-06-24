@@ -1,3 +1,3 @@
-[submodule "Easy-ML"]
-	path = Easy-ML
-	url = https://github.com/aaron777collins/Easy-ML.git
+[submodule "Easy_ML"]
+	path = Easy_ML
+	url = https://github.com/aaron777collins/Easy_ML.git
