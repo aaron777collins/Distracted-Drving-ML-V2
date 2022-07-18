@@ -3,3 +3,4 @@ sklearn-env
 Outputs/output/*
 Figures/*
 Models/*
+dataRaw/*

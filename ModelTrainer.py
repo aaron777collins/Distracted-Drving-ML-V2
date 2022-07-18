@@ -78,10 +78,8 @@ class ModelTrainer:
         for id in range(1, 29):
 
             print(f"Creating Logger for model with id:{id}")
-            self.logger = Logger(
-                f"Models-Scores-allModels-nobk-macro-{id}.txt")
-            self.csvWriter = CSVWriter(
-                f"Models-Scores-allModels-nobk-macro-{id}.csv", CSV_COLUMNS)
+            self.logger = Logger( f"Models-Scores-allModels-nobk-macro-{id}.txt")
+            self.csvWriter = CSVWriter(f"Models-Scores-allModels-nobk-macro-{id}.csv", CSV_COLUMNS)
 
             self.logger.log("Getting clean data..")
             data: pd.DataFrame = DataCleaner().getCleanData(id)
@@ -93,17 +91,15 @@ class ModelTrainer:
             startTime = dt.now()
             features, answers = DataSplitter().getAllFeaturesAndAnswers(data)
             X_train, Y_train, X_val, Y_val, X_test, Y_test = DataSplitter().getTrainValTestSplit(data)
-            self.logger.log(
-                f"Time elapsed: (hh:mm:ss:ms) {dt.now()-startTime}")
+            self.logger.log( f"Time elapsed: (hh:mm:ss:ms) {dt.now()-startTime}")
 
-            self.logger.log(
-                "Quick stats on features and answers for the train-val-test split")
+            self.logger.log( "Quick stats on features and answers for the train-val-test split")
             Helper.quickDfArrStat([X_train, Y_train])
             Helper.quickDfArrStat([X_val, Y_val])
             Helper.quickDfArrStat([X_test, Y_test])
 
-            self.logger.log(
-                "Verifying the features and answers for the sets add up")
+            self.logger.log( "Verifying the features and answers for the sets add up")
+            
             # self.logger.log("Verifying X..")
             featureArr = []
             for df in [X_train, X_val, X_test]:
@@ -195,8 +191,7 @@ class ModelTrainer:
                 # QuadraticDiscriminantAnalysis(),
             ]
 
-            self.logger.log(
-                "Building many models from list the list of classifiers: ", classifierNames)
+            self.logger.log("Building many models from list the list of classifiers: ", classifierNames)
 
             for i, classifier in enumerate(classifiers):
                 model_name = MODEL_FILE_NAME_BEGINNING + \
