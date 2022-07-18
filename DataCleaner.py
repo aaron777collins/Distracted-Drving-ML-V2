@@ -65,6 +65,16 @@ class DataCleaner:
             print(f"{CONCAT_FULL_PATH_WITH_EXT_CLEANED} found! Reading data..")
             return pd.DataFrame(pd.read_csv(CONCAT_FULL_PATH_WITH_EXT_CLEANED))
 
+    def getCleanDataFromSet(self, idNums: list) -> pd.DataFrame:
+        
+        ## Not a good idea to grow a data frame with concat so just make a list of data frames that you use to initialize one
+        concatenatedDfList: list[pd.DataFrame] = []
+
+        for idNum in idNums:
+            concatenatedDfList.append(self.getCleanData(idNum))
+
+        return pd.DataFrame(concatenatedDfList)
+
     def cleanData(self, data: pd.DataFrame, pathStr: str) -> pd.DataFrame:
         # Dropping these rows:
         # fpogs (start time since init of pog)
