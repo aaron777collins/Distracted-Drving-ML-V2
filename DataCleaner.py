@@ -73,7 +73,7 @@ class DataCleaner:
         for idNum in idNums:
             concatenatedDfList.append(self.getCleanData(idNum))
 
-        return pd.DataFrame(concatenatedDfList)
+        return pd.concat(concatenatedDfList)
 
     def cleanData(self, data: pd.DataFrame, pathStr: str) -> pd.DataFrame:
         # Dropping these rows:

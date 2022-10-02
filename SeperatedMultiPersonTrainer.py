@@ -96,13 +96,13 @@ class SeperatedMultiPersonTrainer:
         listOfIdNums: list = self.getIdNumsArray()
         
         #Remember to change splices if MAX_ID changes
-        train: pd.DataFrame = DataCleaner().getCleanDataFromSet(listOfIdNums[0:16]) #16 id's
-        val: pd.DataFrame = DataCleaner().getCleanDataFromSet(listOfIdNums[16:22]) #6 id's
-        test: pd.DataFrame =  DataCleaner().getCleanDataFromSet(listOfIdNums[22:28]) #6 id's
+        train: pd.DataFrame = DataCleaner().getCleanDataFromSet(listOfIdNums[0:24]) #20 id's
+        val: pd.DataFrame = DataCleaner().getCleanDataFromSet(listOfIdNums[24:26]) #4 id's
+        test: pd.DataFrame =  DataCleaner().getCleanDataFromSet(listOfIdNums[26:28]) #4 id's
 
-        self.logger.log( f"Train data is done with Id's {listOfIdNums[0:16]}")
-        self.logger.log( f"Validation data is done with Id's {listOfIdNums[16:22]}")
-        self.logger.log( f"Test data is done with Id's {listOfIdNums[22:28]}")
+        self.logger.log( f"Train data is done with Id's {listOfIdNums[0:24]}")
+        self.logger.log( f"Validation data is done with Id's {listOfIdNums[24:26]}")
+        self.logger.log( f"Test data is done with Id's {listOfIdNums[26:28]}")
 
         allData: pd.DataFrame = DataCleaner().getCleanDataConcat()
 
@@ -168,7 +168,7 @@ class SeperatedMultiPersonTrainer:
 
         for i, classifier in enumerate(classifiers):
             model_name = MODEL_FILE_NAME_BEGINNING + \
-                f"{classifierNames[i]}-" + f"" + MODEL_EXT
+                f"{classifierNames[i]}-" + f"smp" + MODEL_EXT
             modelCompileTime = (dt.now()-dt.now())
 
             model = ModelSaver[StackingClassifier]().readModel(model_name)
@@ -214,21 +214,21 @@ class SeperatedMultiPersonTrainer:
                 self.logger.log(f"train-{test_type.__name__}:", res)
                 row[CSV_FORMAT[f"train-{test_type.__name__}"]] = res
 
-            self.logger.log("Testing model on val")
-            startTime = dt.now()
-            y_pred = model.predict(X_val)
-            timeElapsed = dt.now()-startTime
-            self.logger.log(f"Time elapsed: (hh:mm:ss:ms) {timeElapsed}")
-            row[CSV_FORMAT[f"val-time"]] = timeElapsed.total_seconds() / \
-                len(X_val.index)
-            for test_type in TESTS:
-                res = None
-                if (test_type.__name__ == accuracy_score.__name__):
-                    res = test_type(Y_val, y_pred)
-                else:
-                    res = test_type(Y_val, y_pred, average='macro')
-                self.logger.log(f"val-{test_type.__name__}:", res)
-                row[CSV_FORMAT[f"val-{test_type.__name__}"]] = res
+            # self.logger.log("Testing model on val")
+            # startTime = dt.now()
+            # y_pred = model.predict(X_val)
+            # timeElapsed = dt.now()-startTime
+            # self.logger.log(f"Time elapsed: (hh:mm:ss:ms) {timeElapsed}")
+            # row[CSV_FORMAT[f"val-time"]] = timeElapsed.total_seconds() / \
+            #     len(X_val.index)
+            # for test_type in TESTS:
+            #     res = None
+            #     if (test_type.__name__ == accuracy_score.__name__):
+            #         res = test_type(Y_val, y_pred)
+            #     else:
+            #         res = test_type(Y_val, y_pred, average='macro')
+            #     self.logger.log(f"val-{test_type.__name__}:", res)
+            #     row[CSV_FORMAT[f"val-{test_type.__name__}"]] = res
 
 
             self.logger.log("Testing model on test")
