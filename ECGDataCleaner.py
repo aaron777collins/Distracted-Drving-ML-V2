@@ -15,9 +15,9 @@ CONCAT_FULLPATH_WITHOUT_EXT = path.join(CONCAT_FILE_PATH, CONCAT_FILE_NAME) #dat
 
 class ECGDataCleaner:
 
-    def main(self):
-        data: pd.DataFrame = self.gatherECGDataConcat(overwrite=True)
-        Helper.quickDfStat(data)
+    # def main(self):
+    #     data: pd.DataFrame = self.gatherECGDataConcat(overwrite=True)
+    #     Helper.quickDfStat(data)
 
     def gatherECGDataConcat(self, overwrite=False) -> pd.DataFrame:
         CONCAT_FULL_PATH_WITH_EXT_CLEANED = CONCAT_FULLPATH_WITHOUT_EXT + \
@@ -32,6 +32,36 @@ class ECGDataCleaner:
         else:
             print(f"{CONCAT_FULL_PATH_WITH_EXT_CLEANED} found! Reading data..")
             return pd.DataFrame(pd.read_csv(CONCAT_FULL_PATH_WITH_EXT_CLEANED))
+        
+    def gatherECGDataSingular(self, idNum, overwrite=False,) -> pd.DataFrame:
+        CONCAT_FULL_PATH_WITH_EXT_CLEANED = CONCAT_FULLPATH_WITHOUT_EXT + \
+            "-forId" + str(idNum) + '-valid-cleaned' + CONCAT_FILE_EXT #data\DIB2\concat-data-concat-valid-cleaned.csv 
+
+        #if data not found we need to clean and post it to files
+        if not path.exists(CONCAT_FULL_PATH_WITH_EXT_CLEANED) or overwrite:
+            print(f"{CONCAT_FULL_PATH_WITH_EXT_CLEANED} not found! Cleaning data..")
+            data = self.ensureConcatECGDataGatheredSingular(idNum)
+            return self.cleanData(data, CONCAT_FULL_PATH_WITH_EXT_CLEANED)
+        # read the cleaned data
+        else:
+            print(f"{CONCAT_FULL_PATH_WITH_EXT_CLEANED} found! Reading data..")
+            return pd.DataFrame(pd.read_csv(CONCAT_FULL_PATH_WITH_EXT_CLEANED))
+        
+    def ensureConcatECGDataGatheredSingular(self, idNum) -> pd.DataFrame:
+
+        CONCAT_FULL_PATH_WITH_EXT = CONCAT_FULLPATH_WITHOUT_EXT + "-forId" + str(idNum) + CONCAT_FILE_EXT #data\DIB2\concat-data-concat.csv
+        
+        #if data not found we need to gather and post it to files
+        if not path.exists(CONCAT_FULL_PATH_WITH_EXT):
+            print(f"{CONCAT_FULL_PATH_WITH_EXT} not found! Gathering data..")
+            gatherer = ECGGatherer()
+            return gatherer.gatherData(idNum) #this is a dataFrame
+
+        # read the cleaned data
+        else:
+            print(f"{CONCAT_FULL_PATH_WITH_EXT} found! Reading data..")
+            return pd.DataFrame(pd.read_csv(CONCAT_FULL_PATH_WITH_EXT))
+
 
     def ensureConcatECGDataGathered(self) -> pd.DataFrame:
 
@@ -54,5 +84,5 @@ class ECGDataCleaner:
         return data
 
 
-if __name__ == "__main__":
-    ECGDataCleaner().main()
+# if __name__ == "__main__":
+#     ECGDataCleaner().main()

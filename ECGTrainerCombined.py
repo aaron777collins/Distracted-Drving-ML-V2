@@ -6,13 +6,16 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 from sklearn import metrics
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.calibration import CalibratedClassifierCV, LinearSVC
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.model_selection import cross_val_score
-from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LogisticRegression, PassiveAggressiveClassifier, Perceptron, RidgeClassifier, SGDClassifier
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier
+from sklearn.naive_bayes import BernoulliNB, ComplementNB, GaussianNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.svm import SVC
+from sklearn.svm import SVC, NuSVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.gaussian_process.kernels import RBF
 
@@ -22,7 +25,7 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 from EasyMLLib.helper import Helper
 from ECGDataCleaner import ECGDataCleaner
-from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier, StackingClassifier
+from sklearn.ensemble import AdaBoostClassifier, BaggingClassifier, ExtraTreesClassifier, GradientBoostingClassifier, HistGradientBoostingClassifier, RandomForestClassifier, StackingClassifier, VotingClassifier
 from matplotlib import pyplot as plt
 
 from EasyMLLib.DataSplitter import DataSplitter
@@ -41,20 +44,13 @@ CONCAT_FULLPATH_WITHOUT_EXT = path.join(CONCAT_FILE_PATH, CONCAT_FILE_NAME) #dat
 MODEL_FILE_NAME_BEGINNING = "model-"
 MODEL_EXT = ".model"
 
-# TESTS = ['accuracy', 'precision_micro', 'recall_micro', 'f1_micro', 'precision_macro', 'recall_macro', 'f1_macro']
 TESTS = [accuracy_score, precision_score, recall_score, f1_score]
 TESTS_WITH_SAMPLE_NAMES = []
 for test in TESTS:
     TESTS_WITH_SAMPLE_NAMES.append(f"train-{test.__name__}")
     TESTS_WITH_SAMPLE_NAMES.append(f"val-{test.__name__}")
     TESTS_WITH_SAMPLE_NAMES.append(f"test-{test.__name__}")
-#     TESTS_WITH_SAMPLE_NAMES.append(f"train-{test.__name__}-time")
-#     TESTS_WITH_SAMPLE_NAMES.append(f"val-{test.__name__}-time")
-#     TESTS_WITH_SAMPLE_NAMES.append(f"test-{test.__name__}-time")
 
-# TESTS_WITH_SAMPLE_NAMES.append(f"train")
-# TESTS_WITH_SAMPLE_NAMES.append(f"val")
-# TESTS_WITH_SAMPLE_NAMES.append(f"test")
 TESTS_WITH_SAMPLE_NAMES.append(f"train-time")
 TESTS_WITH_SAMPLE_NAMES.append(f"val-time")
 TESTS_WITH_SAMPLE_NAMES.append(f"test-time")
@@ -69,19 +65,24 @@ CSV_FORMAT = {CSV_COLUMNS[i]: i for i in range(len(CSV_COLUMNS))}
 # PARAM
 OVERWRITE_MODEL = True
 
+CLASSIFIER_NAME = "classifier"
+
 
 class ECGTrainerCombined:
+    def getFeaturesAndAnswers(self, data:pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        return (data.drop([CLASSIFIER_NAME], axis=1), data[CLASSIFIER_NAME])
+
     def main(self):
 
         # id = "concat"
 
         print(f"Creating Logger for model for all concatenated ecg data")
         self.logger = Logger( f"Models-Scores-allModels-nobk-macro-concat-ECG.txt")
-        self.csvWriter = CSVWriter(f"Models-Scores-allModels-nobk-macro-concat-ECG.csv", CSV_COLUMNS)
+        self.csvWriter = CSVWriter(f"Singular6-Models-Scores-allModels-nobk-macro-ECG.csv", CSV_COLUMNS)
 
         self.logger.log("Getting clean data..")
-        data: pd.DataFrame = ECGDataCleaner().gatherECGDataConcat()
-        data.drop(['time'], axis=1, inplace=True)
+        data: pd.DataFrame = ECGDataCleaner().gatherECGDataSingular(6)
+        data.drop(['Time'], axis=1, inplace=True)
         
         self.logger.log("Quick stats on clean data")
         Helper.quickDfStat(data)
@@ -89,9 +90,13 @@ class ECGTrainerCombined:
         self.logger.log("Getting Data Sets..")
         startTime = dt.now()
 
+        features, answers = self.getFeaturesAndAnswers(data)
+        
+        X_train, X_test, Y_train, Y_test = train_test_split(features, answers, test_size=0.4, random_state=42)
+        X_val, X_test, Y_val, Y_test = train_test_split(X_test, Y_test, test_size=0.5, random_state=42)
 
-        features, answers = DataSplitter().getAllFeaturesAndAnswers(data)
-        X_train, Y_train, X_val, Y_val, X_test, Y_test = DataSplitter().getTrainValTestSplit(data)
+        # Aarons code suscks so commenting it out
+        # X_train, Y_train, X_val, Y_val, X_test, Y_test = DataSplitter().getTrainValTestSplit(data)
 
 
         self.logger.log( f"Time elapsed: (hh:mm:ss:ms) {dt.now()-startTime}")
@@ -132,12 +137,54 @@ class ECGTrainerCombined:
             "Decision Tree",
             "Random Forest",
             "Neural Net",
+            "LogisticRegression",
+            "GaussianNB",
+            "SVC",
+            "KNeighborsClassifier",
+            "GradientBoostingClassifier",
+            "AdaBoostClassifier",
+            "BaggingClassifier",
+            "LinearDiscriminantAnalysis",
+            "QuadraticDiscriminantAnalysis",
+            "RidgeClassifier",
+            "SGDClassifier",
+            "PassiveAggressiveClassifier",
+            "Perceptron",
+            "BernoulliNB",
+            "ComplementNB",
+            "MultinomialNB",
+            "CalibratedClassifierCV",
+            "HistGradientBoostingClassifier",
+            "NuSVC",
+            "LinearSVC",
+            "ExtraTreesClassifier"
         ]
 
         classifiers = [
             DecisionTreeClassifier(),
             RandomForestClassifier(),
             MLPClassifier(),
+            LogisticRegression(),
+            GaussianNB(),
+            SVC(),
+            KNeighborsClassifier(),
+            GradientBoostingClassifier(),
+            AdaBoostClassifier(),
+            BaggingClassifier(),
+            LinearDiscriminantAnalysis(),
+            QuadraticDiscriminantAnalysis(),
+            RidgeClassifier(),
+            SGDClassifier(),
+            PassiveAggressiveClassifier(),
+            Perceptron(),
+            BernoulliNB(),
+            ComplementNB(),
+            MultinomialNB(),
+            CalibratedClassifierCV(),
+            HistGradientBoostingClassifier(),
+            NuSVC(),
+            LinearSVC(),
+            ExtraTreesClassifier(),
         ]
 
         self.logger.log("Building many models from list the list of classifiers: ", classifierNames)
@@ -147,7 +194,8 @@ class ECGTrainerCombined:
                 f"{classifierNames[i]}-" + f"" + MODEL_EXT
             modelCompileTime = (dt.now()-dt.now())
 
-            model = ModelSaver[StackingClassifier]().readModel(model_name)
+            # model = ModelSaver[StackingClassifier]().readModel(model_name)
+            model = None 
 
             if(not model or OVERWRITE_MODEL):
                 self.logger.log(f"Building Model on: {classifierNames[i]}")

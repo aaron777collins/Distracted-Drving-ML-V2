@@ -13,7 +13,8 @@ CONCAT_FILE_NAME = "concat-data"
 CONCAT_FILE_EXT = ".csv"
 CONCAT_FULLPATH_WITHOUT_EXT = path.join(CONCAT_FILE_PATH, CONCAT_FILE_NAME) #data data/DIB2/concat-data
 
-CLASSIFIERS = [0, 2]
+# CLASSIFIERS = [0, 2]
+CLASSIFIERS = ["TWO", "ZERO"]
 
 MIN_ID = 1
 MAX_ID = 16
@@ -27,9 +28,55 @@ class ECGGatherer:
             return f'{idNum}'
         else:
             return f'0{idNum}'
+        
+    def getProperClassifierNumber(self, idString) -> int: 
+        if (idString == "ZERO"):
+            return 0
+        
+        # else case on two
+        else:
+            return 2
 
+    ## THIS COMMENTED SECTION IS USING THE OLD ECG DATA
+    # # Gathers the data for a given id
+    # def gatherData(self, idNum) -> pd.DataFrame:
+    #     CONCAT_FULL_PATH_WITH_EXT = CONCAT_FULLPATH_WITHOUT_EXT + \
+    #         "-" + str(idNum) + CONCAT_FILE_EXT #data/DIB2/concat-data-2.csv
 
-    # Gathers the data for a given id
+    #     # Function called when the file isn't found
+    #     def concatFunc() -> pd.DataFrame:
+    #         id = f"0{idNum}"
+    #         dfs = []
+    #         for classifier in CLASSIFIERS:
+
+    #             # hardcoded case to skip 11 because they dont have 0 back
+    #             if (idNum == 11 and classifier == 0):
+    #                 continue
+
+    #             idNumberCleaned = self.getProperIdNumber(idNum)
+
+    #             filePath = path.join(
+    #                 DATASETS_PATH , f'ID{idNumberCleaned}', SELECTED_DATA_SET_PATH, f'ID{idNumberCleaned}_ECG_{classifier}Back.csv') #ID01/ECG/ID01_ECG_0Back.csv
+    #             print(filePath)
+    #             tmpDf: pd.DataFrame = pd.DataFrame(pd.read_csv(filePath, usecols =[0,1], names=['time', 'SP']))
+                
+    #             tmpDf['classifier'] = classifier
+    #             #Helper.quickDfStat(tmpDf)
+    #             dfs.append(tmpDf)
+            
+    #         finalDf = pd.concat(dfs)
+    #         print("Concatenated!")
+    #         #Helper.quickDfStat(finalDf)
+    #         finalDf.to_csv(CONCAT_FULL_PATH_WITH_EXT, index=False)
+    #         print(f"Saved: {CONCAT_FULL_PATH_WITH_EXT}")
+    #         return finalDf
+
+    #     df = DataGatherer().gatherDataFromFile(
+    #         CONCAT_FULL_PATH_WITH_EXT, concatFunc=concatFunc)
+    #     # Helper.quickDfStat(df)
+    #     return df
+    
+    # Gathers the data for a given id (USING NEW ECG DATA)
     def gatherData(self, idNum) -> pd.DataFrame:
         CONCAT_FULL_PATH_WITH_EXT = CONCAT_FULLPATH_WITHOUT_EXT + \
             "-" + str(idNum) + CONCAT_FILE_EXT #data/DIB2/concat-data-2.csv
@@ -40,18 +87,19 @@ class ECGGatherer:
             dfs = []
             for classifier in CLASSIFIERS:
 
-                # hardcoded case to skip 11 because they dont have 0 back
-                if (idNum == 11 and classifier == 0):
+                # hardcoded case to skip 11 and 7 because they dont have data THIS DOES NOTHING -fix
+                if (idNum == 11 or idNum == 7):
+                    print("SKIPPED THIS SECTION")
                     continue
 
                 idNumberCleaned = self.getProperIdNumber(idNum)
 
                 filePath = path.join(
-                    DATASETS_PATH , f'ID{idNumberCleaned}', SELECTED_DATA_SET_PATH, f'ID{idNumberCleaned}_ECG_{classifier}Back.csv') #ID01/ECG/ID01_ECG_0Back.csv
+                    DATASETS_PATH , f'ID{idNumberCleaned}', SELECTED_DATA_SET_PATH, f'heartrate{classifier}.csv') #ID01/ECG/heartrateTWO.csv or heartrateZERO.csv
                 print(filePath)
-                tmpDf: pd.DataFrame = pd.DataFrame(pd.read_csv(filePath, usecols =[0,1], names=['time', 'SP']))
+                tmpDf: pd.DataFrame = pd.DataFrame(pd.read_csv(filePath, usecols =[0,1], names=['HR', 'Time']))
                 
-                tmpDf['classifier'] = classifier
+                tmpDf['classifier'] = self.getProperClassifierNumber(classifier)
                 #Helper.quickDfStat(tmpDf)
                 dfs.append(tmpDf)
             
@@ -76,6 +124,8 @@ class ECGGatherer:
             dfArr: list[pd.DataFrame] = []
 
             for idNum in range(MIN_ID, MAX_ID+1):
+                if (idNum == 11 or idNum == 7): #Break for cases where data doesnt exist
+                    continue
                 dfArr.append(self.gatherData(idNum))
 
             finalDf = pd.concat(dfArr)
